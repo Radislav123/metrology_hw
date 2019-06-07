@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from PIL import Image, ImageTk
 
 
 class _Singleton(type):
@@ -19,6 +20,8 @@ class Window(metaclass=_Singleton):
 
     def __init__(self):
         self.__root = tk.Tk()
+        self.__root.title("Arya")
+        self.__root.iconbitmap("../../resources/drawable/house_stark_icon.ico")
 
         self.__initmenubar()
 
@@ -31,6 +34,7 @@ class Window(metaclass=_Singleton):
         """
         self.__menubar = tk.Menu(self.__root)
         self.__root['menu'] = self.__menubar
+        self.__root.iconbitmap("../../resources/drawable/house_stark_icon.ico")
 
         self.__filemenu = tk.Menu(self.__menubar, tearoff=0)
         self.__filemenu.add_command(label=u"Загрузить из файла", command=self.__loadfromfile)
@@ -60,7 +64,20 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        print(u"Помощь") # TODO поменяй на рабочий код
+        helpwindow = tk.Toplevel(self.__root)
+        helpwindow.transient(self.__root)
+        helpwindow.grab_set()
+        helpwindow.focus_set()
+        helpwindow.title(u"Помощь")
+        helpwindow.iconbitmap("../../resources/drawable/house_stark_icon.ico")
+
+        helpwindow.title(u"Помощь")
+        okbtn = tk.Button(helpwindow,
+                          text=u"Ясно",
+                          command=helpwindow.destroy)
+        okbtn.pack()
+
+        helpwindow.wait_window()  # это запускается в самом конце
 
     def __showabout(self):
         """
@@ -68,7 +85,27 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        print(u"О программе") # TODO поменяй на рабочий код
+        aboutwindow = tk.Toplevel(self.__root)
+        aboutwindow.transient(self.__root)
+        aboutwindow.grab_set()
+        aboutwindow.focus_set()
+
+        aboutwindow.title(u"О программе")
+        aboutwindow.iconbitmap("../../resources/drawable/house_stark_icon.ico")
+
+        img = Image.open("../../resources/drawable/house_stark.jpg")
+        new_width, new_height = 100, 100
+        img = img.resize((new_width, new_height), Image.ANTIALIAS)
+        img = ImageTk.PhotoImage(img)
+        panel = tk.Label(aboutwindow, image=img)
+        panel.pack(side=tk.TOP, fill="both", expand="yes")
+
+        okbtn = tk.Button(aboutwindow,
+                          text=u"Ясно",
+                          command=aboutwindow.destroy)
+        okbtn.pack()
+
+        aboutwindow.wait_window()  # это запускается в самом конце
 
     def run(self):
         """
@@ -78,3 +115,6 @@ class Window(metaclass=_Singleton):
         :return:
         """
         self.__root.mainloop()
+
+    def __test(self):
+        print("Test")
