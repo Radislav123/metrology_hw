@@ -1,6 +1,7 @@
 import numpy as np
 
-def funcname(self, filename: str):
+
+def funcname(filename: str):
     """
     Функция принимает строку с расположением файла
 

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+import service.data_manipulations as data_manip
 
 
 class _Singleton(type):
@@ -30,6 +31,11 @@ class Window(metaclass=_Singleton):
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
     def __placerootcenter(self):
+        """
+        Располагает root в центре экрана
+
+        :return:
+        """
         ws, hs = self.__root.winfo_screenwidth(), self.__root.winfo_screenheight()
         w, h = self.__root.winfo_width(), self.__root.winfo_height()
         x, y = ws / 2 - w / 2, hs / 2 - h / 2
@@ -66,7 +72,7 @@ class Window(metaclass=_Singleton):
         filename = filedialog.askopenfilename(initialdir='/',
                                               title=u"Загрузка",
                                               filetypes=((u"Текстовый файл", "*.txt"),))
-        print("Загрузка:", filename)  # TODO поменяй на рабочий код
+        print("Загрузка:", data_manip.funcname(filename))  # TODO поменяй на рабочий код
 
     def __showhelp(self):
         """
