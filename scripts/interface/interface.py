@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from PIL import Image, ImageTk
 import service.data_manipulations as data_manip
 
@@ -72,7 +73,11 @@ class Window(metaclass=_Singleton):
         filename = filedialog.askopenfilename(initialdir='/',
                                               title=u"Загрузка",
                                               filetypes=((u"Текстовый файл", "*.txt"),))
-        print("Загрузка:", data_manip.funcname(filename))  # TODO поменяй на рабочий код
+        if filename != '':
+            try:
+                print("Загрузка:", data_manip.funcname(filename))  # TODO поменяй на рабочий код
+            except Exception:  # TODO потом поменяй на конкретное исключение
+                messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
     def __showhelp(self):
         """
@@ -88,6 +93,10 @@ class Window(metaclass=_Singleton):
         helpwindow.title(u"Помощь")
         helpwindow.iconbitmap("../../resources/drawable/cool_icon.ico")
         helpwindow.resizable(False, False)
+
+        helplabel = tk.Label(helpwindow,
+                           text="Здесь будет помощь")
+        helplabel.grid(row=0, column=0)
 
         okbtn = tk.Button(helpwindow,
                           padx=30,
