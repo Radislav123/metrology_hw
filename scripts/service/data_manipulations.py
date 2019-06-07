@@ -1,10 +1,15 @@
 import numpy as np
 
 
-def funcname(filename: str):
+def dataload(filename: str):
     """
     Функция принимает строку с расположением файла
 
-    :return: numpy переменная
+    :param filename: имя файла
+    :return:
     """
-    return np.loadtxt(filename, dtype=np.str).astype(np.float)
+    data = np.loadtxt(filename, dtype=np.str)
+    for i, value in enumerate(data):
+        data[i] = value.replace(',', '.')
+    data = data.astype(np.float)
+    return data

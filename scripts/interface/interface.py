@@ -75,7 +75,7 @@ class Window(metaclass=_Singleton):
                                               filetypes=((u"Текстовый файл", "*.txt"),))
         if filename != '':
             try:
-                print("Загрузка:", data_manip.funcname(filename))  # TODO поменяй на рабочий код
+                print("Загрузка:", data_manip.dataload(filename))  # TODO поменяй на рабочий код
             except Exception:  # TODO потом поменяй на конкретное исключение
                 messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
