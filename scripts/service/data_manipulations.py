@@ -7,5 +7,4 @@ def funcname(filename: str):
 
     :return: numpy переменная
     """
-    file = np.loadtxt(filename)
-    return file
+    return np.loadtxt(filename, dtype=np.str).astype(np.float)
