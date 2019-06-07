@@ -19,11 +19,21 @@ class Window(metaclass=_Singleton):
     """
 
     def __init__(self):
+        self.__initroot()
+        self.__initmenubar()
+
+        self.__placerootcenter() # это запускается в самом конце
+
+    def __initroot(self):
         self.__root = tk.Tk()
         self.__root.title("Arya")
-        self.__root.iconbitmap("../../resources/drawable/house_stark_icon.ico")
+        self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        self.__initmenubar()
+    def __placerootcenter(self):
+        ws, hs = self.__root.winfo_screenwidth(), self.__root.winfo_screenheight()
+        w, h = self.__root.winfo_width(), self.__root.winfo_height()
+        x, y = ws / 2 - w / 2, hs / 2 - h / 2
+        self.__root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def __initmenubar(self):
         """
@@ -34,7 +44,7 @@ class Window(metaclass=_Singleton):
         """
         self.__menubar = tk.Menu(self.__root)
         self.__root['menu'] = self.__menubar
-        self.__root.iconbitmap("../../resources/drawable/house_stark_icon.ico")
+        self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
         self.__filemenu = tk.Menu(self.__menubar, tearoff=0)
         self.__filemenu.add_command(label=u"Загрузить из файла", command=self.__loadfromfile)
@@ -68,14 +78,17 @@ class Window(metaclass=_Singleton):
         helpwindow.transient(self.__root)
         helpwindow.grab_set()
         helpwindow.focus_set()
-        helpwindow.title(u"Помощь")
-        helpwindow.iconbitmap("../../resources/drawable/house_stark_icon.ico")
 
         helpwindow.title(u"Помощь")
+        helpwindow.iconbitmap("../../resources/drawable/cool_icon.ico")
+        helpwindow.resizable(False, False)
+
         okbtn = tk.Button(helpwindow,
-                          text=u"Ясно",
+                          padx=30,
+                          text="OK",
+                          font="Arial 11",
                           command=helpwindow.destroy)
-        okbtn.pack()
+        okbtn.grid(row=1, column=0)
 
         helpwindow.wait_window()  # это запускается в самом конце
 
@@ -91,19 +104,34 @@ class Window(metaclass=_Singleton):
         aboutwindow.focus_set()
 
         aboutwindow.title(u"О программе")
-        aboutwindow.iconbitmap("../../resources/drawable/house_stark_icon.ico")
+        aboutwindow.iconbitmap("../../resources/drawable/cool_icon.ico")
+        aboutwindow.resizable(False, False)
+
+        frame = tk.Frame(aboutwindow)
+        frame.grid(row=0, column=0)
 
         img = Image.open("../../resources/drawable/house_stark.jpg")
         new_width, new_height = 100, 100
         img = img.resize((new_width, new_height), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(img)
-        panel = tk.Label(aboutwindow, image=img)
-        panel.pack(side=tk.TOP, fill="both", expand="yes")
+        panelappsymbol = tk.Label(frame, image=img)
+        panelappsymbol.grid(row=0, column=0, rowspan=2)
+
+        labelprogramname = tk.Label(frame,
+                                    text="Arya",
+                                    font="Arial 24")
+        labelprogramname.grid(row=0, column=1)
+        labelauthors = tk.Label(frame,
+                                text=u"Авторы: cher-di, Iftuga, radislav123",
+                                font="Arial 12")
+        labelauthors.grid(row=1, column=1)
 
         okbtn = tk.Button(aboutwindow,
-                          text=u"Ясно",
+                          padx=30,
+                          text="OK",
+                          font="Arial 11",
                           command=aboutwindow.destroy)
-        okbtn.pack()
+        okbtn.grid(row=1, column=0)
 
         aboutwindow.wait_window()  # это запускается в самом конце
 
