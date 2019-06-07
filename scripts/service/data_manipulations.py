@@ -13,6 +13,7 @@ def dataload(filename: str):
         for i, value in enumerate(data):
             data[i] = value.replace(',', '.')
         data = data.astype(np.float)
-    except ValueError:
+    except Exception:
         print("Мб вы пидор?")
+        raise ValueError
     return data

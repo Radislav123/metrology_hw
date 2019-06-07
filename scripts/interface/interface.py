@@ -76,7 +76,7 @@ class Window(metaclass=_Singleton):
         if filename != '':
             try:
                 print("Загрузка:", data_manip.dataload(filename))  # TODO поменяй на рабочий код
-            except Exception:  # TODO потом поменяй на конкретное исключение
+            except ValueError:
                 messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
     def __showhelp(self):
