@@ -9,10 +9,12 @@ class Sample:
 	"""
 
 	__sample__: array
-	__normal_distribution_size__ = 100000
+	__normal_distribution_size__ = 5000000
+	__normal_distribution: array
 
 	def __init__(self, sample):
 		self.__sample__ = sample
+		self.__normal_distribution = numpy.random.normal(self.mean(), self.std(), self.__normal_distribution_size__)
 
 	def mean(self):
 		"""
@@ -36,8 +38,9 @@ class Sample:
 
 		:return: True if the sample satisfies normal distribution and False if does not
 		"""
-		temp = stats.kstest(self.__sample__, 'norm')
+		temp = stats.ks_2samp(self.__sample__, self.__normal_distribution)
 		response = {"statistic": temp[0], "p-value": temp[1]}
+		print(response)
 		return response["p-value"] < response["statistic"]
 
 	def get_distribution_function(self):
@@ -54,9 +57,10 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		response = list()
-		response.append(numpy.sort(self.__sample__))
-		response.append(numpy.array(range(self.__sample__.shape[0]))/float(self.__sample__.shape[0]))
+		response = [
+			numpy.sort(self.__sample__),
+			numpy.array(range(self.__sample__.shape[0]))/float(self.__sample__.shape[0])
+		]
 		return tuple(response)
 
 	def get_normal_distribution_function(self):
@@ -65,7 +69,9 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		return numpy.histogram(self.__sample__, bins = "auto")
+		response = list(numpy.histogram(self.__normal_distribution, bins = "auto"))
+		response[0] = response[0]/max(response[0])*max(self.get_distribution_function()[0])
+		return tuple(response)
 
 	def get_normal_cumulative_distribution_function(self):
 		"""
@@ -73,9 +79,10 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		response = list()
-		response.append(numpy.sort(numpy.random.normal(size = self.__normal_distribution_size__)))
-		response.append(numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__))
+		response = [
+				numpy.sort(self.__normal_distribution),
+				numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__)
+		]
 		return tuple(response)
 
 	def get_sample(self):
