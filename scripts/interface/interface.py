@@ -54,12 +54,16 @@ class Window(metaclass=_Singleton):
 
         self.__status_label = tk.Label(self.__root,
                                        text=u"Выборка не загружена",
-                                       font="Arial 10",
+                                       font="Arial 12",
                                        bg="red")
         self.__status_label.grid(row=0, column=1)
 
-        self.__analyze_result_text = tk.Text(self.__root)
+        self.__analyze_result_text = tk.Text(self.__root, font="Arial 12")
         self.__analyze_result_text.grid(row=1, column=1)
+        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое:\n")
+        self.__analyze_result_text.insert('2.0', u"СКО:\n")
+        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова:")
+        self.__analyze_result_text.config(state=tk.DISABLED)
 
     def __place_root_center(self):
         """
@@ -99,7 +103,7 @@ class Window(metaclass=_Singleton):
 
     def __load_from_file(self):
         """
-        Запись обработанных результатов в текстовый файл
+        Загрузка данных из файла
 
         :return:
         """
@@ -118,6 +122,7 @@ class Window(metaclass=_Singleton):
                                                 u"Имя файла: " + filename.split('/')[-1],
                                            bg="green")
                 self.__plot_new_sample()
+                self.__show_characteristics_of_new_sample()
 
     def __show_help(self):
         """
@@ -176,7 +181,8 @@ class Window(metaclass=_Singleton):
                                       font="Arial 24")
         label_program_name.grid(row=0, column=1)
         label_authors = tk.Label(frame,
-                                 text=u"Авторы: cher-di, Iftuga, radislav123",
+                                 text=u"Авторы: cher-di, Iftuga, radislav123\n"
+                                      u"Сегида Татьяна, Сандлер Анастасия",
                                  font="Arial 12")
         label_authors.grid(row=1, column=1)
 
@@ -203,16 +209,28 @@ class Window(metaclass=_Singleton):
         axes1.legend()
         axes1.set_title(u"Функция распределения")
 
-        # (bins, hist) = self.__sample.get_cumulative_distribution_function()
-        # axes2.plot(bins[:-1], hist, color="blue", label=u"Кумулятивная функция распределения")
-        # (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
-        # axes2.plot(bins[:-1], hist, color="green", label=u"Кумулятивная функция нормального распределения")
-        # axes2.legend()
-        # axes2.set_title(u"Кумулятивная функция распределения")
+        (bins, hist) = self.__sample.get_cumulative_distribution_function()
+        axes2.plot(bins, hist, color="blue", label=u"Кумулятивная функция распределения")
+        (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
+        axes2.plot(bins, hist, color="green", label=u"Кумулятивная функция нормального распределения")
+        axes2.legend()
+        axes2.set_title(u"Кумулятивная функция распределения")
 
         self.__plot_canvas.get_tk_widget().destroy()
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
         self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
+
+    def __show_characteristics_of_new_sample(self):
+        self.__analyze_result_text.config(state=tk.NORMAL)
+        self.__analyze_result_text.delete('1.0', tk.END)
+
+        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое: {}\n".format(self.__sample.mean()))
+        self.__analyze_result_text.insert('2.0', u"СКО: {}\n".format(self.__sample.std()))
+
+        kolmogorov_test_result = u"удовлетворяет" if self.__sample.kolmogorov_norm_test() else u"не удовлетворяет"
+        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {}".format(kolmogorov_test_result))
+
+        self.__analyze_result_text.config(state=tk.DISABLED)
 
     def run(self):
         """

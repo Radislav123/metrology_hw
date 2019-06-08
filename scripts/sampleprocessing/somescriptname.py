@@ -54,9 +54,9 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		response: list
-		response[0] = numpy.sort(self.__sample__)
-		response[1] = numpy.array(range(self.__sample__.shape[0]))/float(self.__sample__.shape[0])
+		response = list()
+		response.append(numpy.sort(self.__sample__))
+		response.append(numpy.array(range(self.__sample__.shape[0]))/float(self.__sample__.shape[0]))
 		return tuple(response)
 
 	def get_normal_distribution_function(self):
@@ -73,9 +73,9 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		response: list
-		response[0] = numpy.sort(numpy.random.normal(size = self.__normal_distribution_size__))
-		response[1] = numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__)
+		response = list()
+		response.append(numpy.sort(numpy.random.normal(size = self.__normal_distribution_size__)))
+		response.append(numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__))
 		return tuple(response)
 
 	def get_sample(self):
