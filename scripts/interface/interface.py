@@ -197,7 +197,7 @@ class Window(metaclass=_Singleton):
         frame = tk.Frame(about_window)
         frame.grid(row=0, column=0)
 
-        img = Image.open("../../resources/drawable/house_stark.jpg")
+        img = Image.open("../../resources/drawable/cool_developers.png")
         new_width, new_height = 100, 100
         img = img.resize((new_width, new_height), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(img)
