@@ -7,6 +7,7 @@ import numpy as np
 import sampleprocessing.somescriptname as data_processing
 
 import matplotlib
+
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -31,8 +32,6 @@ class Window(metaclass=_Singleton):
         self.__init_root()
         self.__init_menubar()
 
-        self.__data = None
-
         self.__place_root_center()  # это запускается в самом конце
 
     def __init_root(self):
@@ -40,12 +39,13 @@ class Window(metaclass=_Singleton):
         self.__root.title("Arya")
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        f = Figure(figsize=(5, 5), dpi=100)
-        a = f.add_subplot(111)
-        a.plot([1, 2, 3, 4, 5, 6, 7, 8], [5, 6, 1, 3, 8, 9, 3, 5])
+        self.__figure = Figure(figsize=(5, 5), dpi=100)
+        self.__axes = self.__figure.add_subplot(111)
+        sample = np.random.normal(0, 3, 1000)
+        self.__axes.hist(sample, int(sample.size ** 0.5))
+        self.__axes.set_title(u"Тестовые данные")
 
-        self.__plot_canvas = FigureCanvasTkAgg(f, self.__root)
-        self.__plot_canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.__plot_canvas = FigureCanvasTkAgg(self.__figure, self.__root)
         self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=3)
 
         self.__status_label = tk.Label(self.__root,
@@ -57,7 +57,8 @@ class Window(metaclass=_Singleton):
         self.__analyze_btn = tk.Button(self.__root,
                                        text=u"Анализ",
                                        font="Arial 10",
-                                       state=tk.DISABLED)
+                                       state=tk.DISABLED,
+                                       command=self.__on_analyze_btn_click)
         self.__analyze_btn.grid(row=1, column=1)
 
         self.__analyze_result_text = tk.Text(self.__root)
@@ -71,7 +72,7 @@ class Window(metaclass=_Singleton):
         """
         ws, hs = self.__root.winfo_screenwidth(), self.__root.winfo_screenheight()
         w, h = self.__root.winfo_width(), self.__root.winfo_height()
-        print(w, h)
+        print(w, h)  # TODO убери на релизе
         x, y = ws / 2 - w / 2, hs / 2 - h / 2
         self.__root.geometry('%dx%d+%d+%d' % (w, h, x, y))
         # self.__root.resizable(False, False)
@@ -88,16 +89,16 @@ class Window(metaclass=_Singleton):
         self.__root['menu'] = self.__menubar
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        self.__filemenu = tk.Menu(self.__menubar, tearoff=0)
-        self.__filemenu.add_command(label=u"Загрузить из файла", command=self.__load_from_file)
-        self.__filemenu.add_command(label=u"Выход", command=self.__root.quit)
+        self.__file_menu = tk.Menu(self.__menubar, tearoff=0)
+        self.__file_menu.add_command(label=u"Загрузить из файла", command=self.__load_from_file)
+        self.__file_menu.add_command(label=u"Выход", command=self.__root.quit)
 
-        self.__helpmenu = tk.Menu(self.__menubar, tearoff=0)
-        self.__helpmenu.add_command(label=u"Помощь", command=self.__show_help)
-        self.__helpmenu.add_command(label=u"О программе", command=self.__show_about)
+        self.__help_menu = tk.Menu(self.__menubar, tearoff=0)
+        self.__help_menu.add_command(label=u"Помощь", command=self.__show_help)
+        self.__help_menu.add_command(label=u"О программе", command=self.__show_about)
 
-        self.__menubar.add_cascade(label=u"Файл", menu=self.__filemenu)
-        self.__menubar.add_cascade(label=u"Помощь", menu=self.__helpmenu)
+        self.__menubar.add_cascade(label=u"Файл", menu=self.__file_menu)
+        self.__menubar.add_cascade(label=u"Помощь", menu=self.__help_menu)
 
     def __load_from_file(self):
         """
@@ -110,10 +111,12 @@ class Window(metaclass=_Singleton):
                                               filetypes=((u"Текстовый файл", "*.txt"),))
         if filename != '':
             try:
-                self.__data = data_manipulation.dataload(filename)
+                sample = data_manipulation.dataload(filename)
+                self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
                                            bg="yellow")
+                self.__analyze_btn.config(state=tk.ACTIVE)
             except ValueError:
                 messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
@@ -178,17 +181,27 @@ class Window(metaclass=_Singleton):
                                  font="Arial 12")
         label_authors.grid(row=1, column=1)
 
-        okbtn = tk.Button(about_window,
-                          padx=30,
-                          text="OK",
-                          font="Arial 11",
-                          command=about_window.destroy)
-        okbtn.grid(row=1, column=0)
+        ok_btn = tk.Button(about_window,
+                           padx=30,
+                           text="OK",
+                           font="Arial 11",
+                           command=about_window.destroy)
+        ok_btn.grid(row=1, column=0)
 
         about_window.wait_window()  # это запускается в самом конце
 
     def __on_analyze_btn_click(self):
-        pass
+        self.__plot_canvas.get_tk_widget().destroy()
+
+        self.__figure = Figure(figsize=(5, 5), dpi=100)
+        self.__axes = self.__figure.add_subplot(111)
+        (hist, bins) = self.__sample.get_distribution_function()
+        self.__axes.hist(self.__sample.get_sample(), bins=bins)
+        self.__axes.set_title(u"Функция распределения")
+
+        self.__plot_canvas.get_tk_widget().destroy()
+        self.__plot_canvas = FigureCanvasTkAgg(self.__figure, self.__root)
+        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=3)
 
     def run(self):
         """
