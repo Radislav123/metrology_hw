@@ -14,6 +14,23 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 
+def center(toplevel):
+    """
+    Расположение окна по центру
+
+    :return:
+    """
+    toplevel.update_idletasks()
+
+    screen_width = toplevel.winfo_screenwidth()
+    screen_height = toplevel.winfo_screenheight()
+
+    size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+    x = screen_width / 2 - size[0] / 2
+    y = screen_height / 2 - size[1] / 2
+
+    toplevel.geometry("+%d+%d" % (x, y))
+
 class _Singleton(type):
     _instances = {}
 
@@ -114,7 +131,7 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        filename = filedialog.askopenfilename(initialdir='/',
+        filename = filedialog.askopenfilename(initialdir='../../resources/',
                                               title=u"Загрузка",
                                               filetypes=((u"Текстовый файл", "*.txt"),))
         if filename != '':
@@ -146,6 +163,8 @@ class Window(metaclass=_Singleton):
         help_window.iconbitmap("../../resources/drawable/cool_icon.ico")
         help_window.resizable(False, False)
 
+        center(help_window)
+
         help_label = tk.Label(help_window, text="Здесь будет помощь")
         help_label.grid(row=0, column=0)
 
@@ -172,6 +191,8 @@ class Window(metaclass=_Singleton):
         about_window.title(u"О программе")
         about_window.iconbitmap("../../resources/drawable/cool_icon.ico")
         about_window.resizable(False, False)
+
+        center(about_window)
 
         frame = tk.Frame(about_window)
         frame.grid(row=0, column=0)
