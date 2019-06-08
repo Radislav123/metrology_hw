@@ -1,12 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import Image, ImageTk
-import service.data_manipulations as data_manipulation
-import numpy as np
-import sampleprocessing.somescriptname as data_processing
 
 import matplotlib
+import numpy as np
+from PIL import Image, ImageTk
+
+import sampleprocessing.somescriptname as data_processing
+import service.data_manipulations as data_manipulation
 
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -37,6 +38,11 @@ class Window(metaclass=_Singleton):
         self.__init_menubar()
 
     def __init_root(self):
+        """
+        Инициализация главного окна root
+
+        :return:
+        """
         self.__root = tk.Tk()
         self.__root.title("Arya")
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
@@ -79,7 +85,6 @@ class Window(metaclass=_Singleton):
         x, y = ws / 2 - w / 2, hs / 2 - h / 2
         self.__root.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.__root.resizable(False, False)
-        # TODO разберись с размерами root
 
     def __init_menubar(self):
         """
@@ -198,6 +203,11 @@ class Window(metaclass=_Singleton):
         about_window.wait_window()  # это запускается в самом конце
 
     def __plot_new_sample(self):
+        """
+        Отрисовка графиков с новыми данными
+
+        :return:
+        """
         self.__plot_canvas.get_tk_widget().destroy()
 
         figure = Figure(figsize=self.__FIG_SIZE, dpi=self.__DPI)
@@ -223,6 +233,14 @@ class Window(metaclass=_Singleton):
         self.__plot_canvas.get_tk_widget().pack()
 
     def __show_characteristics_of_new_sample(self):
+        """
+        Вывод характеристик новой выборки
+        1. Среднее арифметическое
+        2. СКО
+        3. Результат проверки критерия Колмогорова
+
+        :return:
+        """
         self.__analyze_result_text.config(state=tk.NORMAL)
         self.__analyze_result_text.delete('1.0', tk.END)
 
@@ -247,8 +265,12 @@ class Window(metaclass=_Singleton):
 
     @staticmethod
     def __to_fixed(num_obj, digits=0):
-        return f"{num_obj:.{digits}f}"
+        """
+        Принимает число с плавающей запятой, и возвращает его,
+        с digits знаками после запятой
 
-    @staticmethod
-    def __test():
-        print("Test")
+        :param num_obj: число с плавающей запятой
+        :param digits: сколько оставить знаков после запятой
+        :return:
+        """
+        return f"{num_obj:.{digits}f}"
