@@ -39,13 +39,13 @@ class Window(metaclass=_Singleton):
         self.__root.title("Arya")
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        self.__figure = Figure(figsize=(5, 5), dpi=100)
-        self.__axes = self.__figure.add_subplot(111)
+        figure = Figure(figsize=(5, 5), dpi=100)
+        axes = figure.add_subplot(111)
         sample = np.random.normal(0, 3, 1000)
-        self.__axes.hist(sample, int(sample.size ** 0.5))
-        self.__axes.set_title(u"Тестовые данные")
+        axes.hist(sample, int(sample.size ** 0.5))
+        axes.set_title(u"Тестовые данные")
 
-        self.__plot_canvas = FigureCanvasTkAgg(self.__figure, self.__root)
+        self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
         self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
 
         self.__status_label = tk.Label(self.__root,
@@ -186,15 +186,20 @@ class Window(metaclass=_Singleton):
     def __plot_new_sample(self):
         self.__plot_canvas.get_tk_widget().destroy()
 
-        self.__figure = Figure(figsize=(5, 5), dpi=100)
-        self.__axes = self.__figure.add_subplot(111)
+        figure = Figure(figsize=(5, 5), dpi=100)
+        axes1 = figure.add_subplot(211)
+        axes2 = figure.add_subplot(212)
+        
         (hist, bins) = self.__sample.get_distribution_function()
-        self.__axes.hist(self.__sample.get_sample(), bins=bins)
-        self.__axes.set_title(u"Функция распределения")
+        axes1.hist(self.__sample.get_sample(), bins=bins, color="blue")
+        axes1.set_title(u"Функция распределения")
+
+        (hist, bins) = self.__sample.get_normal_distribution_function()
+        axes2.hist(self.__sample.get_sample(), bins=bins, color="orange")
 
         self.__plot_canvas.get_tk_widget().destroy()
-        self.__plot_canvas = FigureCanvasTkAgg(self.__figure, self.__root)
-        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=3)
+        self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
+        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
 
     def run(self):
         """
