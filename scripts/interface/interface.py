@@ -46,7 +46,7 @@ class Window(metaclass=_Singleton):
         self.__axes.set_title(u"Тестовые данные")
 
         self.__plot_canvas = FigureCanvasTkAgg(self.__figure, self.__root)
-        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=3)
+        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
 
         self.__status_label = tk.Label(self.__root,
                                        text=u"Выборка не загружена",
@@ -54,15 +54,8 @@ class Window(metaclass=_Singleton):
                                        bg="red")
         self.__status_label.grid(row=0, column=1)
 
-        self.__analyze_btn = tk.Button(self.__root,
-                                       text=u"Анализ",
-                                       font="Arial 10",
-                                       state=tk.DISABLED,
-                                       command=self.__on_analyze_btn_click)
-        self.__analyze_btn.grid(row=1, column=1)
-
         self.__analyze_result_text = tk.Text(self.__root)
-        self.__analyze_result_text.grid(row=2, column=1)
+        self.__analyze_result_text.grid(row=1, column=1)
 
     def __place_root_center(self):
         """
@@ -115,8 +108,8 @@ class Window(metaclass=_Singleton):
                 self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
-                                           bg="yellow")
-                self.__analyze_btn.config(state=tk.ACTIVE)
+                                           bg="green")
+                self.__plot_new_sample()
             except ValueError:
                 messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
@@ -190,7 +183,7 @@ class Window(metaclass=_Singleton):
 
         about_window.wait_window()  # это запускается в самом конце
 
-    def __on_analyze_btn_click(self):
+    def __plot_new_sample(self):
         self.__plot_canvas.get_tk_widget().destroy()
 
         self.__figure = Figure(figsize=(5, 5), dpi=100)
