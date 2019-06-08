@@ -28,7 +28,7 @@ class Window(metaclass=_Singleton):
     Является синглтоном
     """
 
-    __FIG_SIZE = (6, 7)
+    __FIG_SIZE = (10, 7)
     __DPI = 100
     __PRECISION = 6
 

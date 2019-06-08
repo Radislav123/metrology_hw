@@ -9,7 +9,7 @@ class Sample:
 	"""
 
 	__sample__: array
-	__normal_distribution_size__ = 5000000
+	__normal_distribution_size__ = 10 ** 5
 	__normal_distribution: array
 
 	def __init__(self, sample):
