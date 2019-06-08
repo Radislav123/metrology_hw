@@ -148,7 +148,12 @@ class Window(metaclass=_Singleton):
 
         self.__toplevel_to_center(help_window)
 
-        help_label = tk.Label(help_window, text="Здесь будет помощь")
+        with open('../../resources/help.txt', 'r') as help_file:
+            help_text = help_file.readlines()
+        help_text = ''.join(help_text)
+        help_label = tk.Label(help_window,
+                              text=help_text,
+                              width=200)
         help_label.grid(row=0, column=0)
 
         ok_btn = tk.Button(help_window,
@@ -291,8 +296,10 @@ class Window(metaclass=_Singleton):
         screen_width = toplevel.winfo_screenwidth()
         screen_height = toplevel.winfo_screenheight()
 
-        size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
-        x = screen_width / 2 - size[0] / 2
-        y = screen_height / 2 - size[1] / 2
+        toplevel_width = toplevel.winfo_reqwidth()
+        toplevel_height = toplevel.winfo_reqheight()
+
+        x = screen_width / 2 - toplevel_width / 2
+        y = screen_height / 2 - toplevel_height / 2
 
         toplevel.geometry("+%d+%d" % (x, y))
