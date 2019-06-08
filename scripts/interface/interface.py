@@ -39,11 +39,15 @@ class Window(metaclass=_Singleton):
         self.__root.title("Arya")
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        figure = Figure(figsize=(5, 5), dpi=100)
+        figure = Figure(figsize=(7, 6), dpi=100)
         axes = figure.add_subplot(111)
-        sample = np.random.normal(0, 3, 1000)
-        axes.hist(sample, int(sample.size ** 0.5))
-        axes.set_title(u"Тестовые данные")
+        mu, sigma, num = 0, 3, 10 ** 6
+        nd = np.random.normal(mu, sigma, num)
+        hist, bins = np.histogram(nd, int(num ** 0.5))
+        axes.plot(bins, 1 / (sigma * np.sqrt(2 * np.pi)) *
+                  np.exp(- (bins - mu) ** 2 / (2 * sigma ** 2)),
+                  linewidth=2, color='red')
+        axes.set_title(u"Проверка на критерий Колмагорова")
 
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
         self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
@@ -188,10 +192,10 @@ class Window(metaclass=_Singleton):
     def __plot_new_sample(self):
         self.__plot_canvas.get_tk_widget().destroy()
 
-        figure = Figure(figsize=(5, 5), dpi=100)
-        axes1 = figure.add_subplot(121)
-        axes2 = figure.add_subplot(122)
-        
+        figure = Figure(figsize=(7, 6), dpi=100)
+        axes1 = figure.add_subplot(211)
+        axes2 = figure.add_subplot(212)
+
         (hist, bins) = self.__sample.get_distribution_function()
         axes1.hist(self.__sample.get_sample(), bins=bins, color="blue", label=u"Функция распределения")
         (hist, bins) = self.__sample.get_normal_distribution_function()
@@ -199,12 +203,12 @@ class Window(metaclass=_Singleton):
         axes1.legend()
         axes1.set_title(u"Функция распределения")
 
-        (bins, hist) = self.__sample.get_cumulative_distribution_function()
-        axes2.plot(bins[:-1], hist, color="blue", label=u"Кумулятивная функция распределения")
-        (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
-        axes2.plot(bins[:-1], hist, color="green", label=u"Кумулятивная функция нормального распределения")
-        axes2.legend()
-        axes2.set_title(u"Кумулятивная функция распределения")
+        # (bins, hist) = self.__sample.get_cumulative_distribution_function()
+        # axes2.plot(bins[:-1], hist, color="blue", label=u"Кумулятивная функция распределения")
+        # (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
+        # axes2.plot(bins[:-1], hist, color="green", label=u"Кумулятивная функция нормального распределения")
+        # axes2.legend()
+        # axes2.set_title(u"Кумулятивная функция распределения")
 
         self.__plot_canvas.get_tk_widget().destroy()
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
