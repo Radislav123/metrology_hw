@@ -44,7 +44,7 @@ class Sample:
 		"""
 		Return distribution function of the sample data
 
-		:return: tuple of 2 numpy arrays
+		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
 		return numpy.histogram(self.__sample__, bins = "auto")
 
@@ -52,7 +52,7 @@ class Sample:
 		"""
 		Return cumulative distribution function of the sample data
 
-		:return: tuple of 2 numpy arrays
+		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
 		response: list
 		response[0] = numpy.sort(self.__sample__)
@@ -63,7 +63,7 @@ class Sample:
 		"""
 		Return distribution function of random normal sample
 
-		:return: tuple of 2 numpy arrays
+		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
 		return numpy.histogram(self.__sample__, bins = "auto")
 
@@ -71,9 +71,17 @@ class Sample:
 		"""
 		Return cumulative distribution function of random normal sample
 
-		:return: tuple of 2 numpy arrays
+		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
 		response: list
 		response[0] = numpy.sort(numpy.random.normal(size = self.__normal_distribution_size__))
 		response[1] = numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__)
 		return tuple(response)
+
+	def get_sample(self):
+		"""
+		Return sample data
+
+		:return: numpy array
+		"""
+		return self.__sample__
