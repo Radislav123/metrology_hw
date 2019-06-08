@@ -28,18 +28,39 @@ class Window(metaclass=_Singleton):
     Является синглтоном
     """
 
+    __FIG_SIZE = (6, 7)
+    __DPI = 100
+    __PRECISION = 6
+
     def __init__(self):
         self.__init_root()
         self.__init_menubar()
-
-        self.__place_root_center()  # это запускается в самом конце
 
     def __init_root(self):
         self.__root = tk.Tk()
         self.__root.title("Arya")
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
-        figure = Figure(figsize=(7, 6), dpi=100)
+        status_bar = tk.Frame(self.__root)
+        status_bar.pack()
+
+        self.__status_label = tk.Label(status_bar,
+                                       text=u"Выборка не загружена",
+                                       font="Arial 12",
+                                       bg="red")
+        self.__status_label.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.__analyze_result_text = tk.Text(status_bar,
+                                             font="Arial 12",
+                                             width=35,
+                                             height=3)
+        self.__analyze_result_text.grid(row=0, column=1, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое:\n")
+        self.__analyze_result_text.insert('2.0', u"СКО:\n")
+        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова:")
+        self.__analyze_result_text.config(state=tk.DISABLED)
+
+        figure = Figure(figsize=self.__FIG_SIZE, dpi=self.__DPI)
         axes = figure.add_subplot(111)
         mu, sigma, num = 0, 3, 10 ** 6
         nd = np.random.normal(mu, sigma, num)
@@ -50,33 +71,14 @@ class Window(metaclass=_Singleton):
         axes.set_title(u"Проверка на критерий Колмагорова")
 
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
-        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
+        self.__plot_canvas.get_tk_widget().pack()
 
-        self.__status_label = tk.Label(self.__root,
-                                       text=u"Выборка не загружена",
-                                       font="Arial 12",
-                                       bg="red")
-        self.__status_label.grid(row=0, column=1)
-
-        self.__analyze_result_text = tk.Text(self.__root, font="Arial 12")
-        self.__analyze_result_text.grid(row=1, column=1)
-        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое:\n")
-        self.__analyze_result_text.insert('2.0', u"СКО:\n")
-        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова:")
-        self.__analyze_result_text.config(state=tk.DISABLED)
-
-    def __place_root_center(self):
-        """
-        Располагает root в центре экрана
-
-        :return:
-        """
         ws, hs = self.__root.winfo_screenwidth(), self.__root.winfo_screenheight()
-        w, h = self.__root.winfo_width(), self.__root.winfo_height()
-        print(w, h)  # TODO убери на релизе
+        w = self.__plot_canvas.get_tk_widget().winfo_reqwidth()
+        h = self.__plot_canvas.get_tk_widget().winfo_reqheight() + status_bar.winfo_reqheight()
         x, y = ws / 2 - w / 2, hs / 2 - h / 2
         self.__root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        # self.__root.resizable(False, False)
+        self.__root.resizable(False, False)
         # TODO разберись с размерами root
 
     def __init_menubar(self):
@@ -116,7 +118,7 @@ class Window(metaclass=_Singleton):
             except ValueError:
                 messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
                 return
-            finally:
+            else:
                 self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
@@ -198,7 +200,7 @@ class Window(metaclass=_Singleton):
     def __plot_new_sample(self):
         self.__plot_canvas.get_tk_widget().destroy()
 
-        figure = Figure(figsize=(7, 6), dpi=100)
+        figure = Figure(figsize=self.__FIG_SIZE, dpi=self.__DPI)
         axes1 = figure.add_subplot(211)
         axes2 = figure.add_subplot(212)
 
@@ -218,14 +220,16 @@ class Window(metaclass=_Singleton):
 
         self.__plot_canvas.get_tk_widget().destroy()
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
-        self.__plot_canvas.get_tk_widget().grid(row=0, column=0, rowspan=2)
+        self.__plot_canvas.get_tk_widget().pack()
 
     def __show_characteristics_of_new_sample(self):
         self.__analyze_result_text.config(state=tk.NORMAL)
         self.__analyze_result_text.delete('1.0', tk.END)
 
-        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое: {}\n".format(self.__sample.mean()))
-        self.__analyze_result_text.insert('2.0', u"СКО: {}\n".format(self.__sample.std()))
+        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое: {}\n".
+                                          format(self.__to_fixed(self.__sample.mean(), self.__PRECISION)))
+        self.__analyze_result_text.insert('2.0', u"СКО: {}\n".
+                                          format(self.__to_fixed(self.__sample.std(), self.__PRECISION)))
 
         kolmogorov_test_result = u"удовлетворяет" if self.__sample.kolmogorov_norm_test() else u"не удовлетворяет"
         self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {}".format(kolmogorov_test_result))
@@ -240,6 +244,10 @@ class Window(metaclass=_Singleton):
         :return:
         """
         self.__root.mainloop()
+
+    @staticmethod
+    def __to_fixed(num_obj, digits=0):
+        return f"{num_obj:.{digits}f}"
 
     @staticmethod
     def __test():
