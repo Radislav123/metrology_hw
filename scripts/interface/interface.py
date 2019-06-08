@@ -148,12 +148,11 @@ class Window(metaclass=_Singleton):
 
         self.__toplevel_to_center(help_window)
 
-        with open('../../resources/help.txt', 'r') as help_file:
+        with open('../../resources/cool_help.txt', 'r') as help_file:
             help_text = help_file.readlines()
         help_text = ''.join(help_text)
         help_label = tk.Label(help_window,
-                              text=help_text,
-                              width=200)
+                              text=help_text)
         help_label.grid(row=0, column=0)
 
         ok_btn = tk.Button(help_window,
