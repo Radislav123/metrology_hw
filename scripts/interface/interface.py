@@ -105,13 +105,15 @@ class Window(metaclass=_Singleton):
         if filename != '':
             try:
                 sample = data_manipulation.dataload(filename)
+            except ValueError:
+                messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
+                return
+            finally:
                 self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
                                            bg="green")
                 self.__plot_new_sample()
-            except ValueError:
-                messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
 
     def __show_help(self):
         """
@@ -187,15 +189,22 @@ class Window(metaclass=_Singleton):
         self.__plot_canvas.get_tk_widget().destroy()
 
         figure = Figure(figsize=(5, 5), dpi=100)
-        axes1 = figure.add_subplot(211)
-        axes2 = figure.add_subplot(212)
+        axes1 = figure.add_subplot(121)
+        axes2 = figure.add_subplot(122)
         
         (hist, bins) = self.__sample.get_distribution_function()
-        axes1.hist(self.__sample.get_sample(), bins=bins, color="blue")
+        axes1.hist(self.__sample.get_sample(), bins=bins, color="blue", label=u"Функция распределения")
+        (hist, bins) = self.__sample.get_normal_distribution_function()
+        axes1.plot(bins[:-1], hist, color="orange", label=u"Функция нормального распределения")
+        axes1.legend()
         axes1.set_title(u"Функция распределения")
 
-        (hist, bins) = self.__sample.get_normal_distribution_function()
-        axes2.hist(self.__sample.get_sample(), bins=bins, color="orange")
+        (bins, hist) = self.__sample.get_cumulative_distribution_function()
+        axes2.plot(bins[:-1], hist, color="blue", label=u"Кумулятивная функция распределения")
+        (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
+        axes2.plot(bins[:-1], hist, color="green", label=u"Кумулятивная функция нормального распределения")
+        axes2.legend()
+        axes2.set_title(u"Кумулятивная функция распределения")
 
         self.__plot_canvas.get_tk_widget().destroy()
         self.__plot_canvas = FigureCanvasTkAgg(figure, self.__root)
