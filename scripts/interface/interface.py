@@ -37,6 +37,12 @@ class Window(metaclass=_Singleton):
         self.__init_root()
         self.__init_menubar()
 
+        self.__curr_results = {"mean": None,
+                               "std": None,
+                               "test": None,
+                               "plot1": None,
+                               "plot2": None}
+
     def __init_root(self):
         """
         Инициализация главного окна root
@@ -98,7 +104,10 @@ class Window(metaclass=_Singleton):
         self.__root.iconbitmap("../../resources/drawable/cool_icon.ico")
 
         self.__file_menu = tk.Menu(self.__menubar, tearoff=0)
-        self.__file_menu.add_command(label=u"Загрузить из файла", command=self.__load_from_file)
+        self.__file_menu.add_command(label=u"Загрузить из файла", command=self.__load_data_from_file)
+        self.__file_menu.add_command(label=u"Записать результаты в файл",
+                                     command=self.__save_results_to_file,
+                                     state=tk.DISABLED)
         self.__file_menu.add_command(label=u"Выход", command=self.__root.quit)
 
         self.__help_menu = tk.Menu(self.__menubar, tearoff=0)
@@ -108,7 +117,7 @@ class Window(metaclass=_Singleton):
         self.__menubar.add_cascade(label=u"Файл", menu=self.__file_menu)
         self.__menubar.add_cascade(label=u"Помощь", menu=self.__help_menu)
 
-    def __load_from_file(self):
+    def __load_data_from_file(self):
         """
         Загрузка данных из файла
 
@@ -116,20 +125,53 @@ class Window(metaclass=_Singleton):
         """
         filename = filedialog.askopenfilename(initialdir='../../sample_data/',
                                               title=u"Загрузка",
-                                              filetypes=((u"Текстовый файл", "*.txt"),))
+                                              filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
         if filename != '':
             try:
                 sample = data_manipulation.dataload(filename)
             except ValueError:
-                messagebox.showwarning("Ошибка чтения", "Данные в файле не соответствуют формату")
+                messagebox.showwarning(u"Ошибка чтения", u"Данные в файле не соответствуют формату")
                 return
             else:
                 self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
                                            bg="green")
+                self.__curr_results = data_manipulation.count_curr_results(self.__sample)
                 self.__plot_new_sample()
                 self.__show_characteristics_of_new_sample()
+
+                # возвращаем "Запись результатов в файл" в нормальное состояние
+                self.__file_menu.entryconfig(1, state=tk.NORMAL)
+
+    def __save_results_to_file(self):
+        """
+        Сохранение результатов в файл
+
+        :return:
+        """
+
+        filename_text = filedialog.asksaveasfilename(initialdir='../../output/',
+                                                     title=u"Сохранение текстовых данных",
+                                                     filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
+        if filename_text != '':
+            try:
+                data_manipulation.save_text_results_to_file(filename_text)
+            except IOError:
+                messagebox.showwarning(u"Ошибка записи", u"Данные харатеристик выборки не были сохранены")
+            else:
+                pass  # TODO замени на рабочий код
+
+        filename_plot = filedialog.asksaveasfilename(initialdir='../../output/',
+                                                     title=u"Сохранение графика",
+                                                     filetypes=((u"Portable network graphics (*.png)", "*.png"),))
+        if filename_plot != '':
+            try:
+                data_manipulation.save_plot_results_to_file(filename_plot)
+            except IOError:
+                messagebox.showwarning(u"Ошибка записи", u"Графики не были сохранены")
+            else:
+                pass  # TODO замени на рабочий код
 
     def __show_help(self):
         """
