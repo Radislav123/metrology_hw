@@ -1,6 +1,11 @@
 # Arya - utility to check the Kolmagorov criterion
 To run the program use main.py
 
+Keep in mind that u need to install these packages first:
+- NumPy
+- SciPy
+- Pillow
+
 ## Инструкция по эксплуатации
 ***Добро пожаловать в мини-гайд по небольшой программе под названием Arya.***
 
