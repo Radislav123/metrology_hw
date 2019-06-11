@@ -59,7 +59,7 @@ class Window(metaclass=_Singleton):
 
         self.__analyze_result_text = tk.Text(status_bar,
                                              font="Arial 12",
-                                             width=50,
+                                             width=47,
                                              height=3)
         self.__analyze_result_text.grid(row=0, column=1, sticky=tk.E + tk.W + tk.S + tk.N)
         self.__analyze_result_text.insert('1.0', u"Среднее арифметическое:\n")
