@@ -144,7 +144,7 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        curr_output_dir = '../../data_output/'
+        curr_output_dir = '../../'
         filename_text = filedialog.asksaveasfilename(initialdir=curr_output_dir,
                                                      title=u"Сохранение текстовых данных",
                                                      filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
