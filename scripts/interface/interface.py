@@ -6,7 +6,6 @@ import matplotlib
 import numpy as np
 from PIL import Image, ImageTk
 
-import sampleprocessing.somescriptname as data_processing
 import service.data_manipulations as data_manipulation
 
 matplotlib.use("TkAgg")
@@ -37,11 +36,7 @@ class Window(metaclass=_Singleton):
         self.__init_root()
         self.__init_menubar()
 
-        self.__curr_results = {"mean": None,
-                               "std": None,
-                               "test": None,
-                               "plot1": None,
-                               "plot2": None}
+        self.__curr_results = None
 
     def __init_root(self):
         """
@@ -128,16 +123,15 @@ class Window(metaclass=_Singleton):
                                               filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
         if filename != '':
             try:
-                sample = data_manipulation.dataload(filename)
+                sample = data_manipulation.data_load(filename)
             except ValueError:
                 messagebox.showwarning(u"Ошибка чтения", u"Данные в файле не соответствуют формату")
                 return
             else:
-                self.__sample = data_processing.Sample(sample)
                 self.__status_label.config(text=u"Выборка загружена\n"
                                                 u"Имя файла: " + filename.split('/')[-1],
                                            bg="green")
-                self.__curr_results = data_manipulation.count_curr_results(self.__sample)
+                self.__curr_results = data_manipulation.count_results(sample)
                 self.__plot_new_sample()
                 self.__show_characteristics_of_new_sample()
 
@@ -150,28 +144,32 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-
-        filename_text = filedialog.asksaveasfilename(initialdir='../../output/',
+        curr_output_dir = '../../output/'
+        filename_text = filedialog.asksaveasfilename(initialdir=curr_output_dir,
                                                      title=u"Сохранение текстовых данных",
                                                      filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
         if filename_text != '':
             try:
-                data_manipulation.save_text_results_to_file(filename_text)
+                filename_text = filename_text if filename_text.endswith(".txt") else filename_text + ".txt"
+                data_manipulation.save_text_results_to_file(filename_text, self.__curr_results, self.__PRECISION)
             except IOError:
                 messagebox.showwarning(u"Ошибка записи", u"Данные харатеристик выборки не были сохранены")
-            else:
-                pass  # TODO замени на рабочий код
+            finally:
+                only_filename_text_len = len(filename_text.split('/')[-1])
+                curr_output_dir = filename_text[:-only_filename_text_len]
 
-        filename_plot = filedialog.asksaveasfilename(initialdir='../../output/',
+        filename_plot = filedialog.asksaveasfilename(initialdir=curr_output_dir,
                                                      title=u"Сохранение графика",
                                                      filetypes=((u"Portable network graphics (*.png)", "*.png"),))
         if filename_plot != '':
             try:
-                data_manipulation.save_plot_results_to_file(filename_plot)
+                filename_plot = filename_plot if filename_plot.endswith(".png") else filename_plot + ".png"
+                data_manipulation.save_plot_results_to_file(filename_plot,
+                                                            self.__curr_results,
+                                                            self.__FIG_SIZE,
+                                                            self.__DPI)
             except IOError:
                 messagebox.showwarning(u"Ошибка записи", u"Графики не были сохранены")
-            else:
-                pass  # TODO замени на рабочий код
 
     def __show_help(self):
         """
@@ -264,16 +262,16 @@ class Window(metaclass=_Singleton):
         axes1 = figure.add_subplot(211)
         axes2 = figure.add_subplot(212)
 
-        (hist, bins) = self.__sample.get_distribution_function()
-        axes1.hist(self.__sample.get_sample(), bins=bins, color="blue", label=u"Функция распределения")
-        (hist, bins) = self.__sample.get_normal_distribution_function()
+        (hist, bins) = self.__curr_results["plot1"]["df"]
+        axes1.hist(self.__curr_results["sample"], bins=bins, color="blue", label=u"Функция распределения")
+        (hist, bins) = self.__curr_results["plot1"]["ndf"]
         axes1.plot(bins[:-1], hist, color="orange", label=u"Функция нормального распределения")
         axes1.legend()
         axes1.set_title(u"Функция распределения")
 
-        (bins, hist) = self.__sample.get_cumulative_distribution_function()
+        (bins, hist) = self.__curr_results["plot2"]["cdf"]
         axes2.plot(bins, hist, color="blue", label=u"Кумулятивная функция распределения")
-        (bins, hist) = self.__sample.get_normal_cumulative_distribution_function()
+        (bins, hist) = self.__curr_results["plot2"]["cndf"]
         axes2.plot(bins, hist, color="green", label=u"Кумулятивная функция нормального распределения")
         axes2.legend()
         axes2.set_title(u"Кумулятивная функция распределения")
@@ -294,12 +292,12 @@ class Window(metaclass=_Singleton):
         self.__analyze_result_text.config(state=tk.NORMAL)
         self.__analyze_result_text.delete('1.0', tk.END)
 
-        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое: {}\n".
-                                          format(self.__to_fixed(self.__sample.mean(), self.__PRECISION)))
-        self.__analyze_result_text.insert('2.0', u"СКО: {}\n".
-                                          format(self.__to_fixed(self.__sample.std(), self.__PRECISION)))
+        self.__analyze_result_text.insert('1.0', u"Среднее арифметическое: {}\n".format(
+            data_manipulation.to_fixed(self.__curr_results["mean"], self.__PRECISION)))
+        self.__analyze_result_text.insert('2.0', u"СКО: {}\n".format(
+            data_manipulation.to_fixed(self.__curr_results["std"], self.__PRECISION)))
 
-        kolmogorov_test_result = u"удовлетворяет" if self.__sample.kolmogorov_norm_test() else u"не удовлетворяет"
+        kolmogorov_test_result = u"удовлетворяет" if self.__curr_results["test"] else u"не удовлетворяет"
         self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {}".format(kolmogorov_test_result))
 
         self.__analyze_result_text.config(state=tk.DISABLED)
@@ -312,18 +310,6 @@ class Window(metaclass=_Singleton):
         :return:
         """
         self.__root.mainloop()
-
-    @staticmethod
-    def __to_fixed(num_obj, digits=0):
-        """
-        Принимает число с плавающей запятой, и возвращает его,
-        с digits знаками после запятой
-
-        :param num_obj: число с плавающей запятой
-        :param digits: сколько оставить знаков после запятой
-        :return:
-        """
-        return f"{num_obj:.{digits}f}"
 
     @staticmethod
     def __toplevel_to_center(toplevel):
