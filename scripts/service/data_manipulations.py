@@ -69,7 +69,7 @@ def save_text_results_to_file(filename: str, results: dict, precision: int):
         output_text_file.write(u"СКО: {}\n".
                                format(to_fixed(results["std"], precision)))
         kolmogorov_test_result = u"удовлетворяет" if results["test"] else u"не удовлетворяет"
-        output_text_file.write(u"Критерий Колмогорова: {}\n".format(kolmogorov_test_result))
+        output_text_file.write(u"Критерий Колмогорова: {} на уровне 0.05\n".format(kolmogorov_test_result))
         output_text_file.write(results["norm_test"])
 
 
