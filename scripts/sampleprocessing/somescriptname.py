@@ -9,12 +9,16 @@ class Sample:
 	"""
 
 	__sample__: array
-	__normal_distribution_size__ = 10 ** 5
-	__normal_distribution: array
+	__normal_distribution_size__ = 10 ** 6
+	__normal_distribution__: array
 
 	def __init__(self, sample):
 		self.__sample__ = sample
-		self.__normal_distribution = numpy.random.normal(self.mean(), self.std(), self.__normal_distribution_size__)
+		self.__normal_distribution__ = stats.norm.rvs(
+			loc = self.mean(),
+			scale = self.std(),
+			size = self.__normal_distribution_size__
+		)
 
 	def mean(self):
 		"""
@@ -38,10 +42,20 @@ class Sample:
 
 		:return: True if the sample satisfies normal distribution and False if does not
 		"""
-		temp = stats.ks_2samp(self.__sample__, self.__normal_distribution)
+		temp = stats.ks_2samp(self.__normal_distribution__, self.__normal_distribution__)
 		response = {"statistic": temp[0], "p-value": temp[1]}
 		print(response)
-		return response["p-value"] < response["statistic"]
+		return response["p-value"] < 0.05
+
+	def kolmogorov_norm_test_statistics(self):
+		"""
+		Define sample are normal distributed or not with level 0.05
+
+		:return: statistics and p-value
+		"""
+		temp = stats.ks_2samp(self.__sample__, self.__normal_distribution__)
+		response = u"статистика критерия: " + temp[0].__str__() + "\nдоверительная вероятность: " + temp[1].__str__()
+		return response
 
 	def get_distribution_function(self):
 		"""
@@ -69,7 +83,7 @@ class Sample:
 
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
-		response = list(numpy.histogram(self.__normal_distribution, bins = "auto"))
+		response = list(numpy.histogram(self.__normal_distribution__, bins = "auto"))
 		response[0] = response[0]/max(response[0])*max(self.get_distribution_function()[0])
 		return tuple(response)
 
@@ -80,7 +94,7 @@ class Sample:
 		:return: tuple of 2 numpy arrays (1 - highs, 2 - bins)
 		"""
 		response = [
-				numpy.sort(self.__normal_distribution),
+				numpy.sort(self.__normal_distribution__),
 				numpy.array(range(self.__normal_distribution_size__))/float(self.__normal_distribution_size__)
 		]
 		return tuple(response)
