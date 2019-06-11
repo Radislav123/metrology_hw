@@ -30,6 +30,7 @@ def count_results(sample):
                "mean": ,
                "std": ,
                "test": ,
+               "norm_test": ,
                "plot1": {"df": ,
                          "ndf": },
                "plot2": {"cdf": ,
@@ -42,6 +43,7 @@ def count_results(sample):
                "mean": sample.mean(),
                "std": sample.std(),
                "test": sample.kolmogorov_norm_test(),
+               "norm_test": sample.kolmogorov_norm_test_statistics(),
                "plot1": {"df": sample.get_distribution_function(),
                          "ndf": sample.get_normal_distribution_function()},
                "plot2": {"cdf": sample.get_cumulative_distribution_function(),
@@ -68,6 +70,7 @@ def save_text_results_to_file(filename: str, results: dict, precision: int):
                                format(to_fixed(results["std"], precision)))
         kolmogorov_test_result = u"удовлетворяет" if results["test"] else u"не удовлетворяет"
         output_text_file.write(u"Критерий Колмогорова: {}\n".format(kolmogorov_test_result))
+        output_text_file.write(results["norm_test"])
 
 
 def save_plot_results_to_file(filename: str, results: dict, fig_size: tuple, dpi: int):

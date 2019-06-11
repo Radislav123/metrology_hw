@@ -286,6 +286,7 @@ class Window(metaclass=_Singleton):
         1. Среднее арифметическое
         2. СКО
         3. Результат проверки критерия Колмогорова
+        4. Результат проверки нормального критерия Колмогорова
 
         :return:
         """
@@ -298,7 +299,7 @@ class Window(metaclass=_Singleton):
             data_manipulation.to_fixed(self.__curr_results["std"], self.__PRECISION)))
 
         kolmogorov_test_result = u"удовлетворяет" if self.__curr_results["test"] else u"не удовлетворяет"
-        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {}".format(kolmogorov_test_result))
+        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {}\n".format(kolmogorov_test_result))
 
         self.__analyze_result_text.config(state=tk.DISABLED)
 
