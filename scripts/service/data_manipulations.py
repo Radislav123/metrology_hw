@@ -17,7 +17,6 @@ def data_load(filename: str):
             data[i] = value.replace(',', '.')
         data = data.astype(np.float)
     except Exception:
-        print("Мб вы пидор?")
         raise ValueError
     return data
 

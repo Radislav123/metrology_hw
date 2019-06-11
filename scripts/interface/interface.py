@@ -237,7 +237,7 @@ class Window(metaclass=_Singleton):
         label_program_name.grid(row=0, column=1)
         label_authors = tk.Label(frame,
                                  text=u"Авторы: cher-di, Iftuga, radislav123\n"
-                                      u"meowmik, ещё нет",
+                                      u"meowmik, MermaidKrya",
                                  font="Arial 12")
         label_authors.grid(row=1, column=1)
 
@@ -299,7 +299,8 @@ class Window(metaclass=_Singleton):
             data_manipulation.to_fixed(self.__curr_results["std"], self.__PRECISION)))
 
         kolmogorov_test_result = u"удовлетворяет" if self.__curr_results["test"] else u"не удовлетворяет"
-        self.__analyze_result_text.insert('3.0', u"Критерий Колмогорова: {} на уровне 0.05\n".format(kolmogorov_test_result))
+        self.__analyze_result_text.insert('3.0',
+                                          u"Критерий Колмогорова: {} на уровне 0.05\n".format(kolmogorov_test_result))
 
         self.__analyze_result_text.config(state=tk.DISABLED)
 
