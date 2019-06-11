@@ -100,7 +100,7 @@ class Window(metaclass=_Singleton):
 
         self.__file_menu = tk.Menu(self.__menubar, tearoff=0)
         self.__file_menu.add_command(label=u"Загрузить из файла", command=self.__load_data_from_file)
-        self.__file_menu.add_command(label=u"Записать результаты в файл",
+        self.__file_menu.add_command(label=u"Записать результаты в файлы",
                                      command=self.__save_results_to_file,
                                      state=tk.DISABLED)
         self.__file_menu.add_command(label=u"Выход", command=self.__root.quit)
@@ -118,7 +118,7 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        filename = filedialog.askopenfilename(initialdir='../../sample_data/',
+        filename = filedialog.askopenfilename(initialdir='../../data_sample/',
                                               title=u"Загрузка",
                                               filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
         if filename != '':
@@ -144,7 +144,7 @@ class Window(metaclass=_Singleton):
 
         :return:
         """
-        curr_output_dir = '../../output/'
+        curr_output_dir = '../../data_output/'
         filename_text = filedialog.asksaveasfilename(initialdir=curr_output_dir,
                                                      title=u"Сохранение текстовых данных",
                                                      filetypes=((u"Текстовый файл (*.txt)", "*.txt"),))
