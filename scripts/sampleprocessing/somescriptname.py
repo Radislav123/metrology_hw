@@ -5,12 +5,13 @@ import numpy
 
 class Sample:
 	"""
-	Container class for storaging sample data and computing characteristics of sample
+	Container class for storaging sample data and computing characteristics of a sample
 	"""
 
 	__sample__: array
-	__normal_distribution_size__ = 10 ** 6
+	__normal_distribution_size__ = 10**7*5
 	__normal_distribution__: array
+	__p__ = 0.05
 
 	def __init__(self, sample):
 		self.__sample__ = sample
@@ -42,10 +43,9 @@ class Sample:
 
 		:return: True if the sample satisfies normal distribution and False if does not
 		"""
-		temp = stats.ks_2samp(self.__normal_distribution__, self.__normal_distribution__)
-		response = {"statistic": temp[0], "p-value": temp[1]}
-		print(response)
-		return response["p-value"] < 0.05
+		temp = stats.ks_2samp(self.__sample__, self.__normal_distribution__)
+		response = {"statistic": temp[0]*self.__sample__.shape[0]**0.5, "p-value": temp[1]}
+		return response["p-value"] > self.__p__
 
 	def kolmogorov_norm_test_statistics(self):
 		"""
@@ -54,7 +54,7 @@ class Sample:
 		:return: statistics and p-value
 		"""
 		temp = stats.ks_2samp(self.__sample__, self.__normal_distribution__)
-		response = u"статистика критерия: " + temp[0].__str__() + "\nдоверительная вероятность: " + temp[1].__str__()
+		response = u"статистика критерия: " + temp[0].__str__() + "\np-value: " + temp[1].__str__()
 		return response
 
 	def get_distribution_function(self):
