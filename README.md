@@ -1,4 +1,4 @@
-# Arya - utility to check the Kolmagorov criterion
+# Arya - utility to check the Kolmogorov criterion
 To run the program use main.py
 
 Keep in mind that u need to install these packages first:
