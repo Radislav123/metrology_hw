@@ -5,6 +5,7 @@ Keep in mind that u need to install these packages first:
 - NumPy
 - SciPy
 - Pillow
+- MatPlotLib
 
 ## Инструкция по эксплуатации
 ***Добро пожаловать в мини-гайд по небольшой программе под названием Arya.***
