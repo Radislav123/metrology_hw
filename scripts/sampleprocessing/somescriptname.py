@@ -9,7 +9,7 @@ class Sample:
 	"""
 
 	__sample__: array
-	__normal_distribution_size__ = 10**7*5
+	__normal_distribution_size__ = 10**5
 	__normal_distribution__: array
 	__p__ = 0.05
 

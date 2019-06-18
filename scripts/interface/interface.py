@@ -188,7 +188,7 @@ class Window(metaclass=_Singleton):
 
         self.__toplevel_to_center(help_window)
 
-        with open('../../resources/cool_help.txt', 'r') as help_file:
+        with open('../../resources/cool_help.txt', 'r', encoding='utf-8') as help_file:
             help_text = help_file.readlines()
         help_text = ''.join(help_text)
         help_label = tk.Label(help_window,
